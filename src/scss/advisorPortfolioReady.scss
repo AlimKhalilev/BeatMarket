@@ -357,6 +357,8 @@
 }
 
 .adv-prtf-ready__comparison-tabs {
+  display: flex;
+  flex-wrap: wrap;
   border-bottom: 1px solid $color_block_border;
 
   input[type="radio"] {

@@ -255,7 +255,7 @@ function addPerformanceGraph(node, id, data, isInput, size) {
                 text: ''
             },
             tooltip: {
-                headerFormat: '',
+                headerFormat: '', 
                 pointFormat: `
             <div style="text-align: center;">
               <h5>{point.name}</h5>

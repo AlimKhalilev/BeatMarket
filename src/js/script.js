@@ -18,6 +18,8 @@ $(document).ready(function() {
     --include("_design.js")
     --include("_onboard.js")
     --include("_ticketSelect.js")
+    --include("_monthCashGraph.js")
+    --include("_cryptAnalyticsGraph.js")
 
     document.querySelectorAll(".myStrategy-news-container .table-content-item").forEach(item => {
         item.addEventListener("click", (e) => {
@@ -26,10 +28,10 @@ $(document).ready(function() {
     });
 
     document.querySelectorAll(".myStrategy-items-item").forEach(item => {
-        let indicatorTable = document.querySelector(".myStrategy-indicators-container .table-scroll");
-        if (indicatorTable != null) {
-            indicatorTable.style.width = `${item.offsetWidth-2}px`
-        }
+        let indicatorTable = document.querySelectorAll(".myStrategy-indicators-container .table-scroll");
+        indicatorTable.forEach(elem => {
+            elem.style.width = `${item.offsetWidth-2}px`
+        });
     });
 
     $(".strategyCards-card-range").slider();

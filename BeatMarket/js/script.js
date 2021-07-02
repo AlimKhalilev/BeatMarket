@@ -16,7 +16,8 @@ testWebP(function (support) {
 
 $(document).ready(function() {
 
-    function initModal() {
+    function initModal(DOMelem) {
+
     let overlay = document.querySelector(".overlay_modal");
     let html = document.documentElement;
     let body = document.body;
@@ -63,7 +64,14 @@ $(document).ready(function() {
         document.body.removeChild(scrollBlock);
         return scrollBarWidth;
     }
-    
+
+    if (DOMelem) { // для того, чтобы назначить обработчик на недавно созданный узел, и не вешать заново на остальные
+        DOMelem.addEventListener("click", () => {
+            showModal(DOMelem.dataset.modal)
+        });
+        return;
+    }
+
     document.querySelectorAll("[data-modal]").forEach(item => {
         item.addEventListener("click", () => {
             showModal(item.dataset.modal)
@@ -247,14 +255,39 @@ if (myRenderGraph !== null) {
     
                 breadcrumb.appendChild(breadcrumb_name);
                 breadcrumb.appendChild(breadcrumb_org);
+
+                // добавление popup
+
+                let popup = document.createElement("div");
+                popup.classList.add("breadcrumb-popup");
+
+                let popup_link = document.createElement("span");
+                popup_link.classList.add("breadcrumb-popup__link");
+                popup_link.innerHTML = "Редактирование транзакций";
+                popup_link.setAttribute("data-modal", "modal_add");
+                popup.appendChild(popup_link);
+
+                let popup_link_delete = document.createElement("span");
+                popup_link_delete.classList.add("breadcrumb-popup__link");
+                popup_link_delete.classList.add("breadcrumb-popup__link--delete");
+                popup_link_delete.innerHTML = "Удалить компанию";
+                popup.appendChild(popup_link_delete);
+
+                breadcrumb.appendChild(popup);
     
                 breadcrumbsContainer.appendChild(breadcrumb);
-    
-                breadcrumb.addEventListener("click", function(e) {
+
+                popup_link_delete.addEventListener("click", function(e) {
                     let id = breadcrumb.getAttribute("data-id"); // при клике получаем id breadcrumb
                     breadcrumbs.splice(id, 1); // удаляем из массива объект с необходимым breadcrmb
                     renderBreadcrumbs(breadcrumbs); // перерисовываем
                 });
+    
+                breadcrumb.addEventListener("click", function(e) {
+                    breadcrumb.querySelector(".breadcrumb-popup").classList.toggle("visible");
+                });
+
+                initModal(popup_link); // инициализируем модалку именно на этот узел
     
             });
         }
@@ -774,7 +807,7 @@ function addPerformanceGraph(node, id, data, isInput, size) {
                 text: ''
             },
             tooltip: {
-                headerFormat: '',
+                headerFormat: '', 
                 pointFormat: `
             <div style="text-align: center;">
               <h5>{point.name}</h5>
@@ -943,9 +976,16 @@ initDateRangePicker();
     let commentTableText = document.querySelectorAll(".modal-content-simpleText");
 
     document.querySelectorAll(".statTable__content").forEach(item => {
-        item.addEventListener("click", () => {
-            item.classList.toggle("statTable__content--opened");
-        });
+        if (document.body.offsetWidth <= 768) {
+            item.querySelector(".statSticker").addEventListener("click", () => {
+                item.classList.toggle("statTable__content--opened");
+            });
+        }
+        else {
+            item.addEventListener("click", () => {
+                item.classList.toggle("statTable__content--opened");
+            });
+        }
     });
 
     document.querySelectorAll(".statTable__item--comment").forEach(item => {
@@ -1275,6 +1315,264 @@ initOnBoard(true); // ЕСЛИ TRUE - ИНИЦИАЛИЗИРУЕМ, ИНАЧЕ �
 }
 
 initTicketSelect();
+    function initMonthCashGraph() {
+
+    let colorPaybackDividends = "#47B252";
+    let colorOverallDividends = "#E6EEFF";
+    let widthGraphPoint = 80;
+
+    if (document.body.offsetWidth < 1500) {
+        widthGraphPoint = 65;
+    }
+
+    // общее кол-во дивидендов
+    let dataPrev = [
+        ['Янв', 19.12],
+        ['Фев', 24.12],
+        ['Мар', 38.12],
+        ['Апр', 11.12],
+        ['Май', 24.12],
+        ['Июн', 38.12],
+        ['Июл', 29.12],
+        ['Авг', 46.12],
+        ['Сен', 24.12],
+        ['Окт', 38.12],
+        ['Ноя', 29.12],
+        ['Дек', 46.12]
+    ];
+
+    // выплаченные дивиденды
+    let data = [
+        ['Янв', 15.12],
+        ['Фев', 19.12],
+        ['Мар', 26.12],
+        ['Апр', 17.12],
+        ['Май', 19.12],
+        ['Июн', 0],
+        ['Июл', 27.12],
+        ['Авг', 46.12],
+        ['Сен', 24.12],
+        ['Окт', 38.12],
+        ['Ноя', 29.12],
+        ['Дек', 46.12]
+    ];
+
+    function getData(data) {
+        return data.map(function (country, i) {
+            return {
+                name: country[0],
+                y: country[1],
+                color: colorPaybackDividends
+            };
+        });
+    }
+
+    let elem = document.querySelector("#monthCashGraph");
+    if (elem !== null) {
+        var chart = Highcharts.chart('monthCashGraph', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: '',
+            },
+            plotOptions: {
+                series: {
+                    grouping: false,
+                    borderWidth: 0
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            tooltip: {
+                enabled: false
+            },
+            xAxis: {
+                type: 'category',
+                labels: {
+                    useHTML: true,
+                    animate: true,
+                    style: {
+                        fontFamily: "Montserrat",
+                        fontWeight: "500",
+                        color: "#606371",
+                        fontSize: '0.9rem'
+                    }
+                }
+            },
+            yAxis: [{
+                title: {
+                    text: ''
+                },
+                showFirstLabel: false
+            }],
+            series: [
+            {
+                //enableMouseTracking: false,
+                states: {
+                    hover: {
+                        enabled: false
+                    }
+                },
+                color: colorOverallDividends, // ожидаемые дивиденды
+                borderWidth: 1,
+                borderColor: "#D3E3FF",
+                pointPlacement: 0, // cмещение синего графика
+                linkedTo: 'main',
+                data: dataPrev.slice(),
+                name: 'Ож.дивиденды',
+                pointWidth: widthGraphPoint,
+                borderRadius: widthGraphPoint / 15,
+            }, 
+            {
+                //enableMouseTracking: false,
+                states: {
+                    hover: {
+                        enabled: false
+                    }
+                },
+                name: 'Выпл. дивиденды',
+                borderWidth: 1,
+                borderColor: colorPaybackDividends,
+                id: 'main',
+                pointWidth: widthGraphPoint,
+                borderRadius: widthGraphPoint / 15,
+                dataLabels: [{
+                    enabled: true,
+                    inside: true,
+                    useHTML: true,
+                    verticalAlign: "bottom",
+                    style: {
+                        fontFamily: "Montserrat",
+                        fontWeight: "500",
+                        color: "#24252E",
+                        fontSize: '0.9rem',
+                    },
+                    formatter: function(e) {
+                        return dataPrev[this.x][1] + "$";
+                    }
+                }],
+                data: getData(data).slice(),
+            }],
+            exporting: {
+                allowHTML: true
+            }
+        });
+    }
+}
+
+initMonthCashGraph()
+    const cryptAnalyticsGraphData = [{
+    name: 'BTC',
+    y: 23.03,
+    z: 100,
+    color: "#2C3259",
+    cash: "2.299.222",
+    img: "./img/statTable__icons/bitcoin.svg"
+}, {
+    name: 'TXN',
+    y: 7.11,
+    z: 100,
+    color: "#FFEB34",
+    cash: "2.299.222",
+    img: "./img/statTable__icons/bitcoin.svg"
+}, {
+    name: 'TCKO',
+    y: 8.25,
+    z: 100,
+    color: "#B22D2D",
+    cash: "2.299.222",
+    img: "./img/statTable__icons/bitcoin.svg"
+}, {
+    name: 'Pool',
+    y: 3.03,
+    z: 100,
+    color: "#BC5BDE",
+    cash: "2.299.222",
+    img: "./img/statTable__icons/bitcoin.svg"
+}, {
+    name: 'MA',
+    y: 5.24,
+    z: 100,
+    color: "#2D1336",
+    cash: "2.299.222",
+    img: "./img/statTable__icons/bitcoin.svg"
+}, {
+    name: 'MMA',
+    y: 55.67,
+    z: 100,
+    color: "#842EA3",
+    cash: "2.299.222",
+    img: "./img/statTable__icons/bitcoin.svg"
+}, {
+    name: 'LEG',
+    y: 3.03,
+    z: 100,
+    color: "#5BDE60",
+    cash: "2.299.222",
+    img: "./img/statTable__icons/bitcoin.svg"
+}, {
+    name: 'INT',
+    y: 23.03,
+    z: 100,
+    color: "#2C7259",
+    cash: "2.299.222",
+    img: "./img/statTable__icons/bitcoin.svg"
+}];
+
+const cryptAnalyticsGraph = document.querySelector("#cryptAnalyticsGraph");
+addAnalyticsGraph(cryptAnalyticsGraph, "cryptAnalyticsGraph", cryptAnalyticsGraphData, false, "70%");
+
+function addAnalyticsGraph(node, id, data, isInput, size) {
+    if (node !== null) {
+        Highcharts.chart(id, {
+            chart: {
+                type: 'variablepie',
+                backgroundColor: 'transparent'
+            },
+            title: {
+                text: ''
+            },
+            tooltip: {
+                headerFormat: '', 
+                pointFormat: `
+                    <div class="cryptAnalitycsGraphTooltip">
+                        <div class="cryptAnalitycsGraphTooltip__title">
+                            <img class="cryptAnalitycsGraphTooltip__img" src="{point.img}" alt="Иконка валюты">
+                            <h5>{point.name}</h5>
+                        </div>
+                        <p class="cryptAnalitycsGraphTooltip__cash">{point.cash}$</p>
+                        <p class="cryptAnalitycsGraphTooltip__percent">{point.y}%</p>
+                    </div>
+                `,
+                useHTML: true
+            },
+            series: [{
+                innerSize: size,
+                zMin: 1,
+                name: 'countries',
+                borderWidth: 0,
+                borderColor: null,
+                data: data
+            }]
+        });
+
+        if (isInput) {
+            addPerformanceGraphLabelsRadio(node.nextElementSibling, data, id);
+        }
+        else {
+            if (size === "70%") {
+                addPerformanceGraphLabels(document.querySelector(".content-graphInfo"), data);
+            }
+            else {
+                addPerformanceGraphLabels(node.nextElementSibling, data);
+            }
+        }
+        
+        
+    }
+}
 
     document.querySelectorAll(".myStrategy-news-container .table-content-item").forEach(item => {
         item.addEventListener("click", (e) => {
@@ -1283,10 +1581,10 @@ initTicketSelect();
     });
 
     document.querySelectorAll(".myStrategy-items-item").forEach(item => {
-        let indicatorTable = document.querySelector(".myStrategy-indicators-container .table-scroll");
-        if (indicatorTable != null) {
-            indicatorTable.style.width = `${item.offsetWidth-2}px`
-        }
+        let indicatorTable = document.querySelectorAll(".myStrategy-indicators-container .table-scroll");
+        indicatorTable.forEach(elem => {
+            elem.style.width = `${item.offsetWidth-2}px`
+        });
     });
 
     $(".strategyCards-card-range").slider();
