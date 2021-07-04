@@ -11,7 +11,7 @@ $(document).ready(function() {
     --include("_moveStrategy.js")
     --include("_dividendsGraph.js")
     --include("_inputCounter.js")
-    --include("_banchGraph.js")
+    --include("_banchGraphModern.js")
     --include("_performance.js")
     --include("_dateRangePicker.js")
     --include("_tableMain.js")
@@ -20,7 +20,6 @@ $(document).ready(function() {
     --include("_ticketSelect.js")
     --include("_monthCashGraph.js")
     --include("_cryptAnalyticsGraph.js")
-    --include("_banchGraphModern.js")
 
     document.querySelectorAll(".myStrategy-news-container .table-content-item").forEach(item => {
         item.addEventListener("click", (e) => {

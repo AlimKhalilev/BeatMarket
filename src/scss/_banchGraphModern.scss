@@ -4,6 +4,11 @@
     // .banchGraphModern__graph
 
     &__graph {
-        
+        width: 80px;
+        height: 180px;
+
+        .highcharts-series-group {
+            transform: translateY(-20px);
+        }
     }
 }

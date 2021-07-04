@@ -414,142 +414,164 @@ if (myGraph !== null) {
 }
 
 initInputCounter();
-    function initBanchGraph() {
-    const banchData = {
-        months: ["Янв 2020", "Фев 2020", "Мар 2020", "Апр 2020", "Май 2020", "Июн 2020", "Июл 2020", "Авг 2020", "Сен 2020", "Окт 2020", "Ноя 2020", "Дек 2020"],
-        data: [
+    function initBanchGraphModern() {
+    let graphContent = document.querySelector(".banchGraph-content");
+
+    if (graphContent === null) {
+        return false;
+    }
+
+    const banchGraphData = {
+        names: [
+            'Янв 2020', 'Фев 2020', 'Мар 2020', 'Апр 2020', 'Май 2020', 
+            'Июн 2020', 'Июл 2020', 'Авг 2020', 'Сен 2020', 'Окт 2020', 'Ноя 2020', 'Дек 2020'
+        ],
+        plots: [
             {
                 name: "Мой портфель",
-                class: "primary"
+                data: [32.56, 4.44, 6.18, -10.22, 10.23, 12.22, 32.56, 4.44, 6.18, -10.22, 10.23, 12.22],
+                color: 'rgba(25, 159, 39, 0.8)',
             },
             {
                 name: "S&P 500",
-                class: "success"
-            },
-        ],
-        percentData: [
-            [32.56, -12.22],
-            [4.44, 5.12], 
-            [6.18, -5.22], 
-            [-10.22, 16.66],
-            [10.23, -5.11],
-            [12.22, 20.66],
-            [-5.22, 4.44], 
-            [10.23, -12.22], 
-            [-5.11, 20.66], 
-            [32.56, 10.23], 
-            [5.12, 20.66], 
-            [-5.11, 16.66]
+                data: [-12.22, 5.12, -5.22, -7.22, 16.23, -12.22, 18.56, -14.44, 16.18, 10.22, -10.23, 3.22],
+                color: 'rgba(62, 84, 216, 0.8)'
+            }
         ]
-    };
-
-    const maxValue = fillGraphLabels();
-    fillDescrItems();
-    fillMainGraph(maxValue);
-
-    function fillGraphLabels() { // заполнить серые цифры и графика (обозначения слева)
-        let nums = banchData.percentData.map(item => Math.max.apply(null, item));
-        let maxNum = Math.max.apply(null, nums);
-        let cleanMaxNum = Math.ceil(maxNum).toFixed(2);
-        let cleanArray = [cleanMaxNum, 0, "-" + cleanMaxNum];
-
-        let parentNode = document.querySelector(".banchGraph-descr-percent");
-        if (parentNode === null) {
-            return false;
-        }
-
-        cleanArray.forEach(item => {
-            let elem = document.createElement("span");
-            elem.innerHTML = item;
-            parentNode.appendChild(elem);
-        });
-
-        return cleanMaxNum;
     }
 
-    function fillDescrItems() {
-        let parentNode = document.querySelector(".banchGraph-descr-items");
-        if (parentNode === null) {
-            return false;
-        }
-
-        banchData.data.forEach(item => {
-            let myNode = document.createElement("div");
-            myNode.classList.add("banchGraph-descr-items-item");
-    
-            let mySpan = document.createElement("span");
-            mySpan.classList.add(item.class);
-
-            //if (window.outerWidth > 720) {
-                mySpan.innerHTML = item.name;
-            //}
-
-            myNode.appendChild(mySpan);
-            parentNode.appendChild(myNode);
+    function getAbsBanchData() {
+        let absValues = [];
+        banchGraphData.plots.forEach(item => {
+            absValues.push(Math.abs(...item.data));
         });
+        return Math.max(...absValues);
     }
 
-    function fillMainGraph(maxValue) {
-        let parentNode = document.querySelector(".banchGraph-content");
-        if (parentNode === null) {
-            return false;
-        }
-
-        banchData.months.forEach((item, i) => {
-            let banchGraph_item = document.createElement("div");
-            banchGraph_item.classList.add("banchGraph-content-item");
-
-            let banchGraph_item_graph = document.createElement("div");
-            banchGraph_item_graph.classList.add("banchGraph-content-item-graph");
-
-            let banchGraph_item_graph_half = document.createElement("div");
-            banchGraph_item_graph_half.classList.add("banchGraph-content-item-graph-half");
-
-
-            let banchGraph_item_date = document.createElement("div");
-            banchGraph_item_date.classList.add("banchGraph-content-item-date");
-
-            let banchGraph_item_date_span = document.createElement("span");
-            banchGraph_item_date_span.innerHTML = item;
-            banchGraph_item_date.appendChild(banchGraph_item_date_span);
-
-            let banchGraph_item_stat = document.createElement("div");
-            banchGraph_item_stat.classList.add("banchGraph-content-item-stat");
-
-            banchData.percentData[i].forEach((elem, j) => {
-                let mySpan = document.createElement("span");
-                mySpan.innerHTML = elem + "%";
-                mySpan.classList.add((elem > 0 ? "success" : "error"));
-                banchGraph_item_stat.appendChild(mySpan);
-
-                let banchGraph_item_graph_half_item = document.createElement("div");
-                banchGraph_item_graph_half_item.classList.add("banchGraph-content-item-graph-half-item");
-                banchGraph_item_graph_half_item.classList.add(banchData.data[j].class);
-
-                let myHeight = (elem * 100) / maxValue;
-
-                if (myHeight < 0) {
-                    myHeight = Math.abs(myHeight);
-                    banchGraph_item_graph_half_item.style.transform = "translateY(calc(100% + 2px)) rotate(180deg)";
+    function getSeries(id) {
+        let data = [];
+        banchGraphData.plots.forEach(item => {
+            data.push({
+                name: item.name,
+                data: [item.data[id]],
+                color: item.color,
+                borderRadiusTopLeft: item.data[id] > 0 ? 4 : 0,
+                borderRadiusTopRight: item.data[id] > 0 ? 4 : 0,
+                borderRadiusBottomLeft: item.data[id] < 0 ? 4 : 0,
+                borderRadiusBottomRight: item.data[id] < 0 ? 4 : 0,
+                shadow: {
+                    color: item.color,
+                    width: 4,
+                    offsetY: -0.5,
+                    offsetX: -0.5
                 }
-
-                banchGraph_item_graph_half_item.style.height = `${myHeight}%`;
-
-                banchGraph_item_graph_half.appendChild(banchGraph_item_graph_half_item);
-
             });
+        });
+        return data;
+    }
 
-            banchGraph_item_graph.appendChild(banchGraph_item_graph_half);
+    function renderBanchHTML(id) {
+        let item = document.createElement("div");
+        item.classList.add("banchGraph-content-item");
 
-            banchGraph_item.appendChild(banchGraph_item_graph);
-            banchGraph_item.appendChild(banchGraph_item_date);
-            banchGraph_item.appendChild(banchGraph_item_stat);
-            parentNode.appendChild(banchGraph_item);
+        let itemGraph = document.createElement("div");
+        itemGraph.classList.add("banchGraph-content-item-graph");
+        itemGraph.setAttribute("id", "banchGraphModern-" + id)
+
+        // date
+
+        let itemDate = document.createElement("div");
+        itemDate.classList.add("banchGraph-content-item-date");
+
+        let itemDateSpan = document.createElement("span");
+        itemDateSpan.innerHTML = banchGraphData.names[id];
+        itemDate.appendChild(itemDateSpan);
+
+        // /date
+
+        // stat
+
+        let itemStat = document.createElement("div");
+        itemStat.classList.add("banchGraph-content-item-stat");
+
+        banchGraphData.plots.forEach(elem => {
+            let itemStatSpan = document.createElement("span");
+            itemStatSpan.innerHTML = elem.data[id] + "%";
+
+            if (elem.data[id] > 0) {
+                itemStatSpan.classList.add("success");
+            }
+            if (elem.data[id] < 0) {
+                itemStatSpan.classList.add("error");
+            }
+
+            itemStat.appendChild(itemStatSpan);
+        });
+
+        // /stat
+
+        item.appendChild(itemGraph);
+        item.appendChild(itemDate);
+        item.appendChild(itemStat);
+
+        graphContent.appendChild(item);
+    }
+
+    function renderBanchGraph(id) {
+        Highcharts.chart('banchGraphModern-' + id, {
+            chart: {
+                type: 'column',
+                borderRadius: 6
+            },
+            title: {
+                text: ''
+            },
+            xAxis: {
+                categories: [banchGraphData.names[id]],
+                labels: {
+                    enabled: false
+                },
+                lineWidth: 0
+            },
+            yAxis: {
+                gridLineWidth: 0,
+                labels: {
+                    enabled: false
+                },
+                title: {
+                    enabled: false
+                },
+                min: -1 * getAbsBanchData(),
+                max: getAbsBanchData()
+
+            },
+            credits: {
+                enabled: false
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                column: {
+                    pointWidth: 24,
+                    groupPadding: 0,
+                    borderWidth: 0,
+                    enableMouseTracking: false,
+                }
+            },
+            series: getSeries(id)
         });
     }
+
+    banchGraphData.names.forEach((elem, i) => {
+        renderBanchHTML(i);
+        renderBanchGraph(i);
+    });
+
+    console.log(getAbsBanchData());
 }
 
-initBanchGraph();
+initBanchGraphModern();
     const separation_graph_1_data = [{
     name: 'Intel',
     y: 5,
@@ -1573,52 +1595,6 @@ function addAnalyticsGraph(node, id, data, isInput, size) {
         
     }
 }
-    function initBanchGraphModern() {
-    let graph = document.querySelector(".banchGraphModern__graph");
-    if (graph === null) {
-        return false;
-    }
-
-    Highcharts.chart('banchGraphModern', {
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: ''
-        },
-        xAxis: {
-            gridLineWidth: 5,
-            categories: [
-                'Янв 2020', 'Фев 2020', 'Мар 2020', 'Апр 2020', 'Май 2020', 
-                'Июн 2020', 'Июл 2020', 'Авг 2020', 'Сен 2020', 'Окт 2020', 'Ноя 2020', 'Дек 2020'
-            ]
-        },
-        yAxis: {
-            gridLineWidth: 0
-        },
-        credits: {
-            enabled: false
-        },
-        legend: {
-            enabled: false
-        },
-        series: [{
-            name: 'Мой портфель',
-            data: [32.56, 4.44, 6.18, -10.22, 10.23, 12.22, 32.56, 4.44, 6.18, -10.22, 10.23, 12.22],
-            color: 'rgba(25, 159, 39, 0.8)',
-            pointWidth: 24,
-            groupPadding: 0,
-        }, {
-            name: 'S&P 500',
-            data: [-12.22, 5.12, -5.22, -7.22, 16.23, -12.22, 18.56, 4.44, 16.18, 10.22, -10.23, 3.22],
-            color: 'rgba(62, 84, 216, 0.8)',
-            pointWidth: 24,
-            groupPadding: 0,
-        }]
-    });
-}
-
-initBanchGraphModern();
 
     document.querySelectorAll(".myStrategy-news-container .table-content-item").forEach(item => {
         item.addEventListener("click", (e) => {
