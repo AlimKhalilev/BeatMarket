@@ -20,6 +20,7 @@ $(document).ready(function() {
     --include("_ticketSelect.js")
     --include("_monthCashGraph.js")
     --include("_cryptAnalyticsGraph.js")
+    --include("_banchGraphModern.js")
 
     document.querySelectorAll(".myStrategy-news-container .table-content-item").forEach(item => {
         item.addEventListener("click", (e) => {
