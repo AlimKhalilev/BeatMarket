@@ -43,12 +43,12 @@ function initBanchGraphModern() {
                 borderRadiusTopRight: item.data[id] > 0 ? 4 : 0,
                 borderRadiusBottomLeft: item.data[id] < 0 ? 4 : 0,
                 borderRadiusBottomRight: item.data[id] < 0 ? 4 : 0,
-                shadow: {
-                    color: item.color,
-                    width: 4,
-                    offsetY: -0.5,
-                    offsetX: -0.5
-                }
+                // shadow: {
+                //     color: item.color,
+                //     width: 4,
+                //     offsetY: -0.5,
+                //     offsetX: -0.5
+                // }
             });
         });
         return data;

@@ -892,9 +892,14 @@ $banch_items_height: 60px;
                 .highcharts-background {
                     fill: darken($color_white, 4%);
                 }
+
+                .highcharts-point {
+                    filter: drop-shadow(0px 3px 3px lighten($color_grey, 10%));
+                }
             }
 
             &-graph {
+                position: relative;
                 width: 80px;
                 height: $banch_info_height;
 
@@ -903,9 +908,25 @@ $banch_items_height: 60px;
                     transition: 0.3s ease-in-out;
                 }
 
+                .highcharts-point {
+                    transition: 0.3s ease-in-out;
+                    filter: drop-shadow(0px 2px 2px lighten($color_grey, 10%));
+                }
+
                 display: flex;
                 flex-direction: column;
                 justify-content: start;
+
+                &::after {
+                    content: "";
+                    position: absolute;
+                    width: 100%;
+                    height: 3px;
+                    //background-color: $color_border_graph_banch;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    left: 0;
+                }
             }
 
             &-date {
